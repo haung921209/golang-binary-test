@@ -34,6 +34,14 @@ to quickly create a Cobra application.`,
 	PostRun: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Post run")
 	},
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// 이 함수는 모든 subcommand 실행 전에 호출됩니다.
+		fmt.Println("Before every subcommand...")
+	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		// 이 함수는 모든 subcommand 실행 후에 호출됩니다.
+		fmt.Println("After every subcommand...")
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
