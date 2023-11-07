@@ -11,7 +11,7 @@ import (
 
 // flagExampleCmd represents the flagExample command
 
-var author string
+var name string
 var flagExampleCmd = &cobra.Command{
 	Use:   "flagExample",
 	Short: "A brief description of your command",
@@ -24,8 +24,9 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("flagExample called")
 		fmt.Println("author : ", author)
+		fmt.Println("name : ", name)
 	},
-	//TraverseChildren: true,
+	TraverseChildren: true,
 }
 
 func init() {
@@ -39,6 +40,8 @@ func init() {
 	// and all subcommands, e.g.:
 	// flagExampleCmd.PersistentFlags().String("foo", "", "A help for foo")
 
+	flagExampleCmd.PersistentFlags().StringVar(&name, "name", "MY NAME", "Name for simple example")
+	viper.BindPFlag("name", flagExampleCmd.PersistentFlags().Lookup("name"))
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// flagExampleCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")

@@ -4,11 +4,22 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 )
+
+var (
+	author string
+	result ExecuteResult
+)
+
+// ExecuteResult는 커맨드 실행 결과를 나타내는 인터페이스입니다.
+type ExecuteResult interface {
+	Serialize() ([]byte, error)
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -37,10 +48,24 @@ to quickly create a Cobra application.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// 이 함수는 모든 subcommand 실행 전에 호출됩니다.
 		fmt.Println("Before every subcommand...")
+
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		// 이 함수는 모든 subcommand 실행 후에 호출됩니다.
 		fmt.Println("After every subcommand...")
+		serializedResult, err := result.Serialize()
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(serializedResult))
+		}
+
+		serializedResult2, err := json.Marshal(result)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(serializedResult2))
+		}
 	},
 }
 
@@ -63,4 +88,9 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.PersistentFlags().StringVar(&author, "author", "YOUR NAME", "Author name for copyright attribution")
+
+	// runtime error due to variable scope,,,,
+	// var author1 string
+	// rootCmd.PersistentFlags().StringVar(&author1, "author", "YOUR NAME", "Author name for copyright attribution")
 }
