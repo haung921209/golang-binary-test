@@ -21,6 +21,13 @@ type ExecuteResult interface {
 	Serialize() ([]byte, error)
 }
 
+type EmptyExecuteResult struct {
+}
+
+func (r *EmptyExecuteResult) Serialize() ([]byte, error) {
+	return json.Marshal(r)
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "golang-binary-test root",
@@ -34,6 +41,12 @@ to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// 이 함수는 모든 subcommand 실행 전에 호출됩니다.
+		fmt.Println("Before every subcommand...")
+		result = &EmptyExecuteResult{}
+
+	},
 	PreRun: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Pre run")
 	},
@@ -45,19 +58,16 @@ to quickly create a Cobra application.`,
 	PostRun: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Post run")
 	},
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		// 이 함수는 모든 subcommand 실행 전에 호출됩니다.
-		fmt.Println("Before every subcommand...")
-
-	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		// 이 함수는 모든 subcommand 실행 후에 호출됩니다.
 		fmt.Println("After every subcommand...")
-		serializedResult, err := result.Serialize()
-		if err != nil {
-			fmt.Println(err.Error())
-		} else {
-			fmt.Println(string(serializedResult))
+		if result != nil {
+			serializedResult, err := result.Serialize()
+			if err != nil {
+				fmt.Println(err.Error())
+			} else {
+				fmt.Println(string(serializedResult))
+			}
 		}
 
 		serializedResult2, err := json.Marshal(result)
@@ -65,6 +75,13 @@ to quickly create a Cobra application.`,
 			fmt.Println(err.Error())
 		} else {
 			fmt.Println(string(serializedResult2))
+		}
+
+		serializedResult3, err := json.Marshal(nil)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(serializedResult3))
 		}
 	},
 }
@@ -78,6 +95,7 @@ func Execute() {
 		fmt.Println("panic recovered")
 	}()
 	err := rootCmd.Execute()
+	fmt.Println("Root Cmd Execute end!")
 	if err != nil {
 		os.Exit(1)
 	}
