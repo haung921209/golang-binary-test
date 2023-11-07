@@ -6,14 +6,16 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"log"
+	"os"
 )
 
 var (
 	author string
 	result ExecuteResult
+	v      *viper.Viper
 )
 
 // ExecuteResult는 커맨드 실행 결과를 나타내는 인터페이스입니다.
@@ -102,6 +104,31 @@ func Execute() {
 }
 
 func init() {
+	fmt.Println("root.go init called")
+	// Viper 인스턴스 설정
+	v = viper.New()
+
+	// 설정 파일 이름과 위치를 설정
+	v.SetConfigName("config") // 설정 파일의 이름 (확장자 제외)
+	v.SetConfigType("yaml")   // 예를 들어 "yaml" 설정 파일 형식
+	v.AddConfigPath("/Users/nhn")
+
+	// 환경 변수를 자동으로 읽어들이게 함
+	v.AutomaticEnv()
+
+	// 설정 파일을 읽어들임
+	if err := v.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
+	}
+
+	// 특정 키에 대한 설정을 가져옴
+	host := v.GetString("server.host")
+	port := v.GetInt("server.port")
+
+	// 설정을 사용하여 어떤 작업을 수행
+	fmt.Printf("Server will start at %s:%d\n", host, port)
+
+	fmt.Println("root.go init ended")
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
